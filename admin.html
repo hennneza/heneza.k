@@ -1,45 +1,27 @@
-function addProduct() {
-      const name = document.getElementById("productName").value;
-      const description = document.getElementById("productDescription").value;
-      const price = parseInt(document.getElementById("productPrice").value);
-      const image = document.getElementById("productImage").value;
-
-      if (!name  !description  !price || !image) {
-        alert("لطفاً همه فیلدها را پر کنید.");
-        return;
-      }
-
-      db.collection("products").add({ name, description, price, image }).then(() => {
-        loadProducts();
-      });
-    }
-
-    function loadProducts() {
-      const container = document.getElementById("product-list");
-      container.innerHTML = "";
-
-      db.collection("products").get().then(snapshot => {
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          const card = document.createElement("div");
-          card.className = "product-card";
-          card.innerHTML = 
-            <img src="${data.image}" alt="${data.name}">
-            <h4>${data.name}</h4>
-            <p>${data.description}</p>
-            <p><strong>${data.price.toLocaleString()} تومان</strong></p>
+function loadProducts() {
+    const list = document.getElementById("product-list");
+    db.collection("products").onSnapshot(snapshot => {
+      list.innerHTML = "";
+      snapshot.forEach(doc => {
+        const p = doc.data();
+        list.innerHTML += 
+          <div class="product-card">
+            <img src="${p.image}" alt="${p.name}">
+            <h4>${p.name}</h4>
+            <p>${p.description}</p>
+            <p><strong>${p.price.toLocaleString()} تومان</strong></p>
             <button onclick="deleteProduct('${doc.id}')">حذف</button>
-          ;
-          container.appendChild(card);
-        });
+          </div>
+        ;
       });
-    }
+    });
+  }
 
-    function deleteProduct(id) {
-      if (confirm("آیا مطمئن هستید؟")) {
-        db.collection("products").doc(id).delete().then(() => loadProducts());
-      }
+  function deleteProduct(id) {
+    if (confirm("مطمئنی که می‌خوای حذفش کنی؟")) {
+      db.collection("products").doc(id).delete();
     }
-  </script>
+  }
+</script>
 </body>
 </html>
